@@ -1,0 +1,6 @@
+Artificial intelligence is widely used in healthcare.
+AI helps with medical imaging, diagnostics, patient monitoring,
+and predictive healthcare analytics.
+Machine learning models assist doctors in detecting diseases earlier.
+AI helps with medical imaging, diagnostics, patient monitoring,
+and predictive healthcare analytics.

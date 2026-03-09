@@ -1,0 +1,98 @@
+from app.agents.base import BaseAgent
+from app.agents.schemas import SharedState, AgentOutput
+
+from app.llm.ollama_client import OllamaClient
+from app.rag.retriever import Retriever
+from app.tools.tool_manager import ToolManager
+
+
+class ResearcherAgent(BaseAgent):
+
+    def __init__(self):
+
+        super().__init__(
+            name="Researcher",
+            role="Information Gathering Specialist",
+            description="Researches topics using LLM knowledge, document retrieval, and available tools."
+        )
+
+        self.llm = OllamaClient(model="llama3")
+
+        self.retriever = Retriever()
+
+        self.tools = ToolManager()
+
+        # Load documents into vector database
+        self.retriever.ingest_documents()
+
+    def generate(self, state: SharedState) -> AgentOutput:
+
+        task = state.original_task
+
+        # ---------- TOOL CHECK ----------
+
+        tool_result = self.tools.try_use_tool(task)
+
+        if tool_result:
+
+            return AgentOutput(
+                agent=self.name,
+                thought="The query required a tool execution.",
+                result=tool_result,
+                confidence=0.99,
+                recommended_next_agent="Writer",
+                terminate=False
+            )
+
+        # ---------- RAG RETRIEVAL ----------
+
+        retrieved_context = self.retriever.retrieve(task)
+
+        # ---------- CONVERSATION HISTORY ----------
+
+        history = "\n".join(state.conversation_history)
+
+        # ---------- LLM PROMPT ----------
+
+        prompt = f"""
+You are a professional research assistant.
+
+Conversation History:
+{history}
+
+User Query:
+{task}
+
+Relevant Knowledge From Documents:
+{retrieved_context}
+
+Instructions:
+- Combine retrieved knowledge with reasoning
+- Provide structured research insights
+- Highlight important facts
+- Use bullet points where possible
+"""
+
+        try:
+
+            llm_response = self.llm.generate(prompt)
+
+            return AgentOutput(
+                agent=self.name,
+                thought="Retrieved knowledge from vector database and combined with LLM reasoning.",
+                result=llm_response,
+                confidence=0.92,
+                recommended_next_agent="Analyst",
+                terminate=False
+            )
+
+        except Exception as e:
+
+            return AgentOutput(
+                agent=self.name,
+                thought="Error occurred during research.",
+                result=str(e),
+                confidence=0.0,
+                recommended_next_agent=None,
+                terminate=True
+            )

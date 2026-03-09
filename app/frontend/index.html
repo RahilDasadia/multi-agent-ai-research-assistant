@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>AI Research Assistant</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background:#1e1e1e;
+    color:white;
+    display:flex;
+    flex-direction:column;
+    height:100vh;
+}
+
+/* HEADER */
+
+.header{
+    padding:16px;
+    text-align:center;
+    font-size:22px;
+    border-bottom:1px solid #333;
+}
+
+/* CHAT AREA */
+
+.chat-container{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    overflow:hidden;
+}
+
+.chat{
+    width:800px;
+    max-width:90%;
+    padding:20px;
+    overflow-y:auto;
+}
+
+/* MESSAGES */
+
+.message{
+    margin-bottom:18px;
+    display:flex;
+}
+
+.user{
+    justify-content:flex-end;
+}
+
+.ai{
+    justify-content:flex-start;
+}
+
+.bubble{
+    padding:12px 16px;
+    border-radius:12px;
+    max-width:70%;
+    white-space:pre-wrap;
+    line-height:1.5;
+}
+
+.user .bubble{
+    background:#2563eb;
+}
+
+.ai .bubble{
+    background:#333;
+}
+
+/* INPUT AREA */
+
+.input-area{
+    display:flex;
+    justify-content:center;
+    padding:16px;
+    border-top:1px solid #333;
+    background:#111;
+}
+
+.input-box{
+    width:800px;
+    max-width:90%;
+    display:flex;
+}
+
+textarea{
+    flex:1;
+    height:55px;
+    resize:none;
+    padding:10px;
+    font-size:15px;
+    border-radius:8px;
+    border:none;
+}
+
+button{
+    margin-left:10px;
+    padding:10px 18px;
+    border:none;
+    background:#2563eb;
+    color:white;
+    border-radius:8px;
+    font-size:15px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#1d4ed8;
+}
+
+.loading{
+    font-style:italic;
+    color:#aaa;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+AI Research Assistant
+</div>
+
+<div class="chat-container">
+<div id="chat" class="chat"></div>
+</div>
+
+<div class="input-area">
+
+<div class="input-box">
+
+<textarea id="prompt" placeholder="Ask anything..."></textarea>
+
+<button onclick="sendPrompt()">Send</button>
+
+</div>
+
+</div>
+
+<script>
+
+function addMessage(text, type){
+
+    const chat = document.getElementById("chat")
+
+    const msg = document.createElement("div")
+    msg.className = `message ${type}`
+
+    const bubble = document.createElement("div")
+    bubble.className = "bubble"
+    bubble.innerText = text
+
+    msg.appendChild(bubble)
+    chat.appendChild(msg)
+
+    chat.scrollTop = chat.scrollHeight
+
+    return bubble
+}
+
+function sendPrompt(){
+
+    const promptInput = document.getElementById("prompt")
+    const prompt = promptInput.value.trim()
+
+    if(!prompt) return
+
+    promptInput.value=""
+
+    addMessage(prompt,"user")
+
+    const aiBubble = addMessage("Generating...","ai")
+    aiBubble.classList.add("loading")
+
+    fetch(`/stream?task=${encodeURIComponent(prompt)}`)
+    .then(response=>{
+
+        const reader = response.body.getReader()
+        const decoder = new TextDecoder()
+
+        aiBubble.innerText=""
+        aiBubble.classList.remove("loading")
+
+        function read(){
+
+            reader.read().then(({done,value})=>{
+
+                if(done) return
+
+                const chunk = decoder.decode(value)
+
+                aiBubble.innerText += chunk
+
+                const chat = document.getElementById("chat")
+                chat.scrollTop = chat.scrollHeight
+
+                read()
+
+            })
+
+        }
+
+        read()
+
+    })
+}
+
+/* ENTER TO SEND */
+
+document.getElementById("prompt").addEventListener("keypress",function(e){
+
+    if(e.key==="Enter" && !e.shiftKey){
+
+        e.preventDefault()
+        sendPrompt()
+
+    }
+
+})
+
+</script>
+
+</body>
+
+</html>
