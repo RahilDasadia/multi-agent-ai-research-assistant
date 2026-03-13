@@ -10,7 +10,7 @@ class AnalystAgent(BaseAgent):
             role="Insight Extraction Specialist",
             description="Analyzes research findings and extracts structured insights."
         )
-        self.llm = OllamaClient(model="llama3")
+        self.llm = OllamaClient(model="phi3")
 
     def generate(self, state: SharedState) -> AgentOutput:
         if not state.intermediate_results:

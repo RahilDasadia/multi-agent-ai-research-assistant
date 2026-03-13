@@ -18,7 +18,7 @@ class ResearcherAgent(BaseAgent):
             description="Researches topics using LLM knowledge, document retrieval, and available tools."
         )
 
-        self.llm = OllamaClient(model="llama3")
+        self.llm = OllamaClient(model="phi3")
 
         self.retriever = Retriever()
 
