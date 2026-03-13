@@ -2,22 +2,19 @@ from sentence_transformers import SentenceTransformer
 
 
 class Embedder:
+
     def __init__(self):
-        """
-        Load a lightweight embedding model suitable for CPU.
-        """
+        # Load model once when object is created
         self.model = SentenceTransformer("all-MiniLM-L6-v2")
 
     def embed_documents(self, chunks):
         """
-        Convert a list of text chunks into embeddings.
+        Convert text chunks into embeddings
         """
-        return Embedder.model.encode(chunks)
-
-        return embeddings
+        return self.model.encode(chunks)
 
     def embed_query(self, query: str):
         """
-        Convert a user query into embedding vector.
+        Convert query into embedding
         """
-        return Embedder.model.encode([query])[0]
+        return self.model.encode([query])[0]
