@@ -7,7 +7,9 @@ from app.tools.tool_manager import ToolManager
 
 
 class ResearcherAgent(BaseAgent):
+
     retriever_loaded = False
+
     def __init__(self):
 
         super().__init__(
@@ -22,10 +24,13 @@ class ResearcherAgent(BaseAgent):
 
         self.tools = ToolManager()
 
-        # Load documents into vector database
+        # Load documents only once
         if not ResearcherAgent.retriever_loaded:
-            self.retriever.ingest_documents()
-            ResearcherAgent.retriever_loaded = True
+            try:
+                self.retriever.ingest_documents()
+                ResearcherAgent.retriever_loaded = True
+            except Exception as e:
+                print("RAG ingestion error:", e)
 
     def generate(self, state: SharedState) -> AgentOutput:
 
@@ -36,10 +41,9 @@ class ResearcherAgent(BaseAgent):
         tool_result = self.tools.try_use_tool(task)
 
         if tool_result:
-
             return AgentOutput(
                 agent=self.name,
-                thought="The query required a tool execution.",
+                thought="Used tool to answer the query.",
                 result=tool_result,
                 confidence=0.99,
                 recommended_next_agent="Writer",
@@ -48,7 +52,12 @@ class ResearcherAgent(BaseAgent):
 
         # ---------- RAG RETRIEVAL ----------
 
-        retrieved_context = self.retriever.retrieve(task)
+        retrieved_context = ""
+
+        try:
+            retrieved_context = self.retriever.retrieve(task)
+        except Exception as e:
+            print("RAG retrieval error:", e)
 
         # ---------- CONVERSATION HISTORY ----------
 
@@ -79,9 +88,12 @@ Instructions:
 
             llm_response = self.llm.generate(prompt)
 
+            # DEBUG: see actual LLM output
+            print("LLM RESPONSE:", llm_response)
+
             return AgentOutput(
                 agent=self.name,
-                thought="Retrieved knowledge from vector database and combined with LLM reasoning.",
+                thought="Retrieved knowledge and generated research insights.",
                 result=llm_response,
                 confidence=0.92,
                 recommended_next_agent="Analyst",
