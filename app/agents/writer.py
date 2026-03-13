@@ -26,25 +26,33 @@ class WriterAgent(BaseAgent):
         analysis_content = state.intermediate_results[-1]
 
         prompt = f"""
-You are a professional report writer.
-
-You have received the following analytical insights:
+Below is analytical content:
 
 {analysis_content}
 
-Your task:
-- Convert this into a polished, structured professional report
-- Add a strong executive summary at the top
-- Ensure logical flow
-- Improve clarity and readability
-- Use professional tone
-- Keep it well formatted with headings
+Rewrite it as a **clean professional report**.
 
-Produce a final comprehensive report.
+Rules:
+- DO NOT include "AI:" or "User:"
+- DO NOT simulate conversation
+- DO NOT include dialogue
+- ONLY output the final report
+- Start directly with the report
+
+Structure:
+
+Executive Summary
+
+Key Insights
+
+Detailed Explanation
+
+Conclusion
 """
 
         try:
             final_report = self.llm.generate(prompt)
+            final_report = final_report.replace("AI:", "").replace("User:", "")
 
             return AgentOutput(
                 agent=self.name,

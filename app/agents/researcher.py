@@ -78,10 +78,11 @@ Relevant Knowledge From Documents:
 {retrieved_context}
 
 Instructions:
-- Combine retrieved knowledge with reasoning
-- Provide structured research insights
-- Highlight important facts
-- Use bullet points where possible
+- Provide clear factual information
+- Use bullet points
+- Do not simulate conversation
+- Do not write "AI:" or "User:"
+- Only output the research findings
 """
 
         try:
