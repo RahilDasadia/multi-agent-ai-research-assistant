@@ -1,20 +1,20 @@
-from app.tools.calculator import CalculatorTool
-from app.tools.system_tool import SystemTool
-
-
 class ToolManager:
 
-    def __init__(self):
+    def try_use_tool(self, task: str):
 
-        self.calculator = CalculatorTool()
-        self.system_tool = SystemTool()
+        task = task.lower()
 
-    def use_tool(self, tool_name: str, input_value: str):
+        # Calculator detection
+        if any(op in task for op in ["+", "-", "*", "/"]):
+            try:
+                result = eval(task)
+                return f"Calculation Result: {result}"
+            except:
+                return None
 
-        if tool_name == "calculator":
-            return self.calculator.calculate(input_value)
+        # Time detection
+        if "time" in task or "current time" in task:
+            from datetime import datetime
+            return f"Current system time: {datetime.now()}"
 
-        if tool_name == "time":
-            return self.system_tool.current_time()
-
-        return "Tool not found"
+        return None
