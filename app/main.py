@@ -38,12 +38,10 @@ def stream_run(task: str):
 
         result = orchestrator.run(task)
 
-        words = result.split()
+        for char in result:
+            yield char
 
-        for word in words:
-            yield word + " "
-
-    return StreamingResponse(generate(), media_type="text/plain")
+    return StreamingResponse(generate(), media_type="text/event-stream")
 
 @app.get("/", response_class=HTMLResponse)
 def home():
