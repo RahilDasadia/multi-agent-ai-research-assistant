@@ -193,7 +193,7 @@ function sendPrompt(){
 
                 if(done) return
 
-                const chunk = decoder.decode(value)
+                const chunk = decoder.decode(value , {stream:true})
 
                 aiBubble.innerText += chunk
 
