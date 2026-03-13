@@ -10,7 +10,7 @@ class WriterAgent(BaseAgent):
             role="Professional Report Generator",
             description="Transforms analytical insights into a polished professional report."
         )
-        self.llm = OllamaClient(model="phi3")
+        self.llm = OllamaClient(model="tinyLlama")  # Use a smaller model for writing to save resources
 
     def generate(self, state: SharedState) -> AgentOutput:
         if not state.intermediate_results:
