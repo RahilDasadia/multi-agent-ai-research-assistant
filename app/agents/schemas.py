@@ -12,12 +12,6 @@ class AgentOutput(BaseModel):
 
 
 class SharedState(BaseModel):
-    original_task: str
-    messages: List[str] = []
-    intermediate_results: List[str] = []
-    final_output: Optional[str] = None
-
-class SharedState(BaseModel):
 
     original_task: str
 

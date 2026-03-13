@@ -12,7 +12,7 @@ class Embedder:
         """
         Convert a list of text chunks into embeddings.
         """
-        embeddings = self.model.encode(chunks)
+        return Embedder.model.encode(chunks)
 
         return embeddings
 
@@ -20,4 +20,4 @@ class Embedder:
         """
         Convert a user query into embedding vector.
         """
-        return self.model.encode([query])[0]
+        return Embedder.model.encode([query])[0]

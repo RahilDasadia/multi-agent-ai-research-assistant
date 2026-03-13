@@ -7,7 +7,7 @@ from app.tools.tool_manager import ToolManager
 
 
 class ResearcherAgent(BaseAgent):
-
+    retriever_loaded = False
     def __init__(self):
 
         super().__init__(
@@ -23,7 +23,9 @@ class ResearcherAgent(BaseAgent):
         self.tools = ToolManager()
 
         # Load documents into vector database
-        self.retriever.ingest_documents()
+        if not ResearcherAgent.retriever_loaded:
+            self.retriever.ingest_documents()
+            ResearcherAgent.retriever_loaded = True
 
     def generate(self, state: SharedState) -> AgentOutput:
 
