@@ -19,6 +19,13 @@ class OllamaClient:
         response = requests.post(self.url, json=payload)
 
         return response.json()["response"]
+        result = data.get("response", "").strip()
+
+        # Fix Ollama weird outputs like 'response'
+        if result.lower() in ["response", "'response'", '"response"']:
+            return "No meaningful response generated."
+
+        return result
 
     def stream_generate(self, prompt: str):
 
