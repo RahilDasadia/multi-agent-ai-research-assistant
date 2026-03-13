@@ -58,7 +58,7 @@ class Orchestrator:
                 break
 
             output: AgentOutput = agent.generate(state)
-
+            print("AGENT:", output.agent, "| RESULT:", output.result)
             # Save agent message to DB
             db_message = models.AgentMessage(
                 run_id=db_run.id,
