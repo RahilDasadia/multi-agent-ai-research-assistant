@@ -37,7 +37,10 @@ class Orchestrator:
 
         state = SharedState(
             original_task=task,
-            conversation_history=[task]
+            conversation_history=[task],
+            messages=[],
+            intermediate_results=[],
+            final_output=None
         )
 
         current_agent_name = "Researcher"
@@ -111,6 +114,8 @@ class Orchestrator:
             else:
                 current_agent_name = output.recommended_next_agent
 
-        db.close()
+        if not state.final_output and state.messages:
+            state.final_output = state.messages[-1]
 
+        db.close()
         return state.final_output
