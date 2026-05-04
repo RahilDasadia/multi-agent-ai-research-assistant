@@ -224,7 +224,7 @@ Potential enhancements for the project:
 
 # Author
 
-Developed by **Your Name**
+Developed by **Rahil Dasadia**
 
 This project was built as a learning exercise to explore **multi-agent AI systems, RAG architectures, and LLM integration**.
 
